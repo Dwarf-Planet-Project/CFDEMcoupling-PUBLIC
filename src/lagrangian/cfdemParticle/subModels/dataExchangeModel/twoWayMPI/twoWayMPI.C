@@ -121,8 +121,10 @@ twoWayMPI::~twoWayMPI()
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 char* twoWayMPI::wordToChar(word& inWord) const
 {
-    string HH = string(inWord);
-    return const_cast<char*>(HH.c_str());
+    return const_cast(inWord.c_str());
+    // See: https://www.cfdem.com/forums/liggghts-could-not-find-property-%01-write-data-calling-program
+    //string HH = string(inWord);
+    //return const_cast(HH.c_str());
 }
 
 
