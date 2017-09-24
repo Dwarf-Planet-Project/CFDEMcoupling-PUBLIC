@@ -1,3 +1,0 @@
-cfdemSolverIB.C
-
-EXE=$(CFDEM_APP_DIR)/cfdemSolverIB_Stokes
