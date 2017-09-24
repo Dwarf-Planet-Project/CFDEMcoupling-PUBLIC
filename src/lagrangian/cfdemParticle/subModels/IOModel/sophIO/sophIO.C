@@ -88,6 +88,7 @@ int sophIO::dumpDEMdata() const
         streamDataToPath(lagPath_, particleCloud_.impForces(),npProcs,"impForces","vector","vectorField","");
         streamDataToPath(lagPath_, particleCloud_.expForces(),npProcs,"expForces","vector","vectorField","");
         streamDataToPath(lagPath_, particleCloud_.DEMForces(),npProcs,"DEMForces","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.DEMTorques(),npProcs,"DEMTorques","vector","vectorField",""); // Aycock
     }
     return npProcs;
 }

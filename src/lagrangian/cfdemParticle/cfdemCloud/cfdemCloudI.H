@@ -110,6 +110,7 @@ inline double ** cfdemCloud::impForces() const
     return impForces_;
 }
 
+
 inline double ** cfdemCloud::expForces() const
 {
     return expForces_;
@@ -119,6 +120,13 @@ inline double ** cfdemCloud::DEMForces() const
 {
     return DEMForces_;
 }
+
+// Aycock
+inline double ** cfdemCloud::DEMTorques() const
+{
+    return DEMTorques_;
+}
+//
 
 inline double ** cfdemCloud::Cds() const
 {

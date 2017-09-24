@@ -65,6 +65,8 @@ private:
 
     bool twoDimensional_;
 
+    scalar particleRho_;
+
     word densityFieldName_;
 
     const volScalarField& rho_;    // ref to fluid density

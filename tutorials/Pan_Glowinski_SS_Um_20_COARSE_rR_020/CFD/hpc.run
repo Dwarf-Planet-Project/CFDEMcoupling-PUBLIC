@@ -1,0 +1,19 @@
+#!/bin/bash
+## Required PBS Directives --------------------------------------
+#PBS -q standard
+#PBS -l select=1:ncpus=2:mpiprocs=2
+#PBS -l walltime=10:00:00
+
+## Optional PBS Directives --------------------------------------
+#PBS -N SS
+#PBS -j oe
+#PBS -S /bin/bash
+#PBS -V
+
+
+cd $PBS_O_WORKDIR
+
+
+aprun -n 1 rm -r processor*
+aprun -n 1 decomposePar > log.decomposePar
+aprun -n ${BC_MPI_TASKS_ALLOC} cfdemSolverIB_mod_no_stop -parallel > log.cfdemSolverIB_mod_no_stop

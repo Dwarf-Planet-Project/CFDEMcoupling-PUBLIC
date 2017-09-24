@@ -1,0 +1,30 @@
+#!/usr/bin/gnuplot
+
+set print "-"
+#set style line 1  lw 0.1;
+
+#set xrange [0:0.007]
+#set yrange [-0.5:0]
+set key on bottom right
+#set term x11 0 enhanced  font 'Helvetica,10'
+set term qt font ',16' persist
+#set term font 'Helvetica,16'
+
+set xlabel "z Position (cm)"
+set ylabel "Normalized Force (F/w_p)"
+
+particleW=system("python calcWeight.py 0.005 1060")
+print particleW
+
+#set x2tics 0.1
+#set grid x2tics
+
+# change back
+set grid xtics mxtics 
+set xtics 1
+set mxtics 10
+
+plot "<paste position_particle_1.txt forces_particle_1.txt | awk '{print $2, $8}'" u ($1*100):($2/particleW) with lines t "ρ_p/ρ_f = 1.02, no damping", \
+
+pause 1 
+reread 

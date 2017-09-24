@@ -61,9 +61,18 @@ protected:
     mutable double **angularVelocities_;
     label pRefCell_;
     scalar pRefValue_;
+
+    // Aycock
+    vector impForcesLast;
+    vector expForcesLast;
+    vector DEMForcesLast;
+    vector DEMTorquesLast;
+    // End
     
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
+    mutable bool checkPeriodicCells_;
+    mutable bool rotationCoupling_;
 
 public:
 

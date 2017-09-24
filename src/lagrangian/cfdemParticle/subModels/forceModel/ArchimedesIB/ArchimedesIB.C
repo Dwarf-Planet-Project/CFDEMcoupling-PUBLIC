@@ -103,41 +103,65 @@ ArchimedesIB::~ArchimedesIB()
 void ArchimedesIB::setForce() const
 {
     vector force;
-
+ 
     #include "setupProbeModel.H"
-
+ 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        //if(mask[index][0])
+        force=vector::zero;
+
+        // NUMERICAL:
+        for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        {
+            label cellI = particleCloud_.cellIDs()[index][subCell];
+            if (cellI > -1) // particle Found
+            {
+                //force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-particleCloud_.voidfractions()[index][subCell]);//mod by alice
+                force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-voidfractions_[cellI]); //mod by alice
+            }
+        } 
+
+        // ANALYTICAL: 
+        //if(Pstream::master())
         //{
-            force=vector::zero;
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
-            {
-                label cellI = particleCloud_.cellIDs()[index][subCell];
-                if (cellI > -1) // particle Found
-                {
-                    //force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-particleCloud_.voidfractions()[index][subCell]);//mod by alice
-                	force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-voidfractions_[cellI]);//mod by alice
-        	    }
-            }
-
-            //Set value fields and write the probe
-            if(probeIt_)
-            {
-                #include "setupProbeModelfields.H"
-                vValues.append(force);           //first entry must the be the force
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-            }
-
-            // set force on particle
-            if(twoDimensional_) Warning<<"ArchimedesIB model doesn't work for 2D right now!!\n"<< endl;
-            if(!treatDEM_)
-            {
-                if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += force[j];
-                else for(int j=0;j<3;j++) impForces()[index][j] += force[j];
-            }
-            for(int j=0;j<3;j++) DEMForces()[index][j] += force[j];
+        //    scalar particleRadius = particleCloud_.radius(index);
+        //    scalar particleVolume = 4./3. * M_PI * particleRadius * particleRadius * particleRadius;
+        //    force  = -rho_[0] * g_.value() * particleVolume; // Assume uniform rho
         //}
+
+ 
+        // *********************************** //
+        // FILE OUTPUT:
+        // *********************************** //
+        vector forceTemp = force;
+        reduce(forceTemp, sumOp<vector>());
+        if(Pstream::master())
+        {
+            std::ofstream forceFileOutput;
+            forceFileOutput.open ("f_ArchimedesIB.csv", std::ofstream::app);
+            forceFileOutput << rho_.mesh().time().value() << "\t" << forceTemp[0] << "\t" << forceTemp[1] << "\t" << forceTemp[2] << "\n";
+            forceFileOutput.close();
+        }
+        // *********************************** //
+        // *********************************** //
+ 
+        //Set value fields and write the probe
+        if(probeIt_)
+        {
+            #include "setupProbeModelfields.H"
+            vValues.append(force);           //first entry must the be the force
+            particleCloud_.probeM().writeProbe(index, sValues, vValues);
+        }
+
+        // set force on particle
+        if(twoDimensional_) Warning<<"ArchimedesIB model doesn't work for 2D right now!!\n"<< endl;
+        if(!treatDEM_)
+        {
+            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += force[j];
+            else for(int j=0;j<3;j++) impForces()[index][j] += force[j];
+        }
+        for(int j=0;j<3;j++) DEMForces()[index][j] += force[j];
+        
     }
 }
 

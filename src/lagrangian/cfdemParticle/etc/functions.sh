@@ -171,6 +171,45 @@ compileLIGGGHTS()
     make -f Makefile.lib $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
 }
 
+compileLIGGGHTSnoClean()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    headerText="$3"
+    #--------------------------------------------------------------------------------#
+
+    #- clean up old log file
+    rm $logpath/$logfileName
+
+    #- change path
+    cd $CFDEM_LIGGGHTS_SRC_DIR
+
+    #- header
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- write path
+    pwd 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- wclean and wmake
+    rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
+    rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
+    make clean-all 2>&1 | tee -a $logpath/$logfileName
+    if [[ $WM_NCOMPPROCS == "" ]]; then
+        echo "compiling LIGGGHTS on one CPU"
+        make $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
+    else
+        echo "compiling LIGGGHTS on $WM_NCOMPPROCS CPUs"
+        make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
+    fi
+    make makelib 2>&1 | tee -a $logpath/$logfileName
+    make -f Makefile.lib $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
+}
+
 #==================================#
 #- function to compile a lammps lib
 
@@ -211,6 +250,48 @@ compileLMPlib()
     make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
 }
 #==================================#
+
+#==================================#
+#- function to compile a lammps lib
+
+compileLMPlibNoClean()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    headerText="$3"
+    makeFileName="$4"
+    libraryPath="$5"
+    #--------------------------------------------------------------------------------#
+
+    #- clean up old log file
+    rm $logpath/$logfileName
+
+    #- change path
+    cd $libraryPath
+
+    #- header
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- write path
+    pwd 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- clean up
+    #echo "make clean" 2>&1 | tee -a $logpath/$logfileName
+    #echo 2>&1 | tee -a $logpath/$logfileName
+    #make -f $makeFileName clean 2>&1 | tee -a $logpath/$logfileName
+
+    #- compile
+    echo "make" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+    make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+}
+#==================================#
+
 
 #==================================#
 #- function to clean CFDEMcoupling solvers and src

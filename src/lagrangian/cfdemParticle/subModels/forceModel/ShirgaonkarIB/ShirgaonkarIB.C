@@ -35,6 +35,8 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "voidFractionModel.H"
 
+//#include "pressureGradientExplicitSource.H" // ???
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -64,6 +66,7 @@ ShirgaonkarIB::ShirgaonkarIB
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     verbose_(false),
+    calcPeriodicPressureForce_(false), // AYCOCK
     twoDimensional_(false),
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
@@ -71,14 +74,16 @@ ShirgaonkarIB::ShirgaonkarIB
     densityFieldName_(propsDict_.lookup("densityFieldName")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
-    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
+    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_)),
+    voidFraction_(sm.mesh().lookupObject<volScalarField> ("voidfractionNext"))
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "shirgaonkarIB.logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
     particleCloud_.probeM().writeHeader();
 
-    if (propsDict_.found("verbose")) verbose_=true;
+    if (propsDict_.found("verbose")) verbose_=true; 
+    if (propsDict_.found("calcPeriodicPressureForce")) calcPeriodicPressureForce_=true; // AYCOCK
     if (propsDict_.found("twoDimensional"))
     {
         twoDimensional_=true;
@@ -105,14 +110,16 @@ void ShirgaonkarIB::setForce() const
     label cellI;
     vector drag;
 
-    #ifdef comp
+    #ifdef comp // For compressible flow?
         // get viscosity field
         const volScalarField& mufField = particleCloud_.turbulence().mu();
         volVectorField h = (mufField*fvc::laplacian(U_)-fvc::grad(p_));
     #else
         // get viscosity field
         const volScalarField& nufField = particleCloud_.turbulence().nu();
-        volVectorField h = rho_*(nufField*fvc::laplacian(U_)-fvc::grad(p_));
+        volVectorField h = rho_*(nufField*fvc::laplacian(U_)-fvc::grad(p_)); // Pressure and viscous forces
+        //volVectorField h = rho_*(-fvc::grad(p_)); // Pressure force only 
+        //volVectorField h = rho_*(nufField*fvc::laplacian(U_)); // Viscous force only
     #endif
 
     #include "setupProbeModel.H"
@@ -123,6 +130,15 @@ void ShirgaonkarIB::setForce() const
         //{
             drag=vector::zero;
 
+            scalar gradP0_ = 0;
+
+            if(calcPeriodicPressureForce_) {
+                const dictionary& propsDict = h.mesh().lookupObject<IOdictionary>("myGradP");
+                gradP0_ = readScalar(propsDict.lookup("gradient"));
+                Info<< "Gradient read:\t" << gradP0_ << endl;
+            }
+
+
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -131,10 +147,42 @@ void ShirgaonkarIB::setForce() const
                 if (cellI > -1) // particle Found
                 {
                     drag += h[cellI]*h.mesh().V()[cellI];
+
+                    // We need to know the flow direction! here, we are assuming it is (1 0 0)
+                    // Using Gauss law (divergence theorem), we can convert the surface integral into a volume integral, which is more convenient:  
+                    if(calcPeriodicPressureForce_) drag += vector(gradP0_ * h.mesh().V()[cellI], 0, 0);
                 }
 
-            }
+            } 
 
+
+            // ************************************************************* // 
+            // Calculate the force from the pressure gradient when using a 
+            // momentum source - AYCOCK
+            // ************************************************************* //
+            //if(calcPeriodicPressureForce_) {
+            //    const dictionary& propsDict = h.mesh().lookupObject<IOdictionary>("myGradP");
+            //    scalar gradP0_ = readScalar(propsDict.lookup("gradient"));
+
+            //    Info<< "Gradient read:\t" << gradP0_ << endl;
+            //    
+            //    if(Pstream::master())
+            //    {
+            //        scalar particleRadius = particleCloud_.radius(index);
+            //        scalar particleVolume = 4./3. * M_PI * particleRadius * particleRadius * particleRadius;
+ 
+            //        // We need to know the flow direction! here, we are assuming it is (1 0 0)
+            //        // Using Gauss law (divergence theorem), we can convert the surface integral into a volume integral, which is more convenient:
+            //        scalar pressureGradientForce = particleVolume * gradP0_ * rho_[0];
+            //        Info<< "gradP0_:\t" << gradP0_ << "\t particleVolume:\t" << particleVolume << "\t density:\t" << rho_[0] << endl;
+            //        Info<< "Force from pressure gradient ('pressureGradientExplicitSource' momentum source):\t" << pressureGradientForce << endl;
+            //        drag += vector(pressureGradientForce, 0,  0);  // Assume uniform rho (incompressible)
+            //    }
+            //}
+            // ************************************************************* //
+            // END
+            // ************************************************************* //
+          
             // set force on particle
             if(twoDimensional_) drag /= depth_;
 
@@ -149,6 +197,7 @@ void ShirgaonkarIB::setForce() const
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
             else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
             for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
+            //Info<< "Drag (master thread): " << drag << endl;
 
             if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
         //}

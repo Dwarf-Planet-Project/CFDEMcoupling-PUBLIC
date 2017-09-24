@@ -1,0 +1,16 @@
+#!/usr/bin/gnuplot
+
+#set style line 1  lw 0.1;
+set xrange [0:]
+set yrange [0:1]
+#set term qt font ',18'
+
+set xlabel "Time (?)"
+set ylabel "Normalized Radial Position (r/R)"
+
+#timeScaleFactor = 2.5 / 20; # R / Um
+plot 'Pan_Glowinski_r_R.csv' u 1:2 every 1 with l t 'Pan & Glowinski', \
+     'Pan_Glowinski_r_R.csv' u 1:2 every 1 with l t 'Pan & Glowinski', \
+     'position_particle_1.txt' u 1:($4/2.5) every 1000 with l t 'NEW'
+pause 1
+reread

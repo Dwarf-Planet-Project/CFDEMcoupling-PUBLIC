@@ -61,6 +61,7 @@ private:
     dictionary propsDict_;
 
     bool verbose_;
+    bool calcPeriodicPressureForce_; // AYCOCK
 
     bool twoDimensional_;
 
@@ -77,6 +78,8 @@ private:
     word pressureFieldName_;
 
     const volScalarField& p_;
+
+    const volScalarField& voidFraction_;
 
 public:
 

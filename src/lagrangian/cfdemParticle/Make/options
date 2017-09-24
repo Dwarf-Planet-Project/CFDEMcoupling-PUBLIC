@@ -1,6 +1,10 @@
 sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
 sinclude $(RULES)/mplib$(WM_MPLIB)
 
+GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
+PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
+
+include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
 EXE_INC = \
      $(PFLAGS) \
@@ -26,3 +30,5 @@ LIB_LIBS = \
     -lmpi_cxx \
     -L$(CFDEM_LIGGGHTS_SRC_DIR) \
     -Wl,--whole-archive -l$(CFDEM_LIGGGHTS_LIB_NAME) -Wl,--no-whole-archive \
+     $(CFDEM_ADD_LIB_PATHS) \
+     $(CFDEM_ADD_STATICLIBS) 

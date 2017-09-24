@@ -1,0 +1,16 @@
+#!/usr/bin/gnuplot
+
+#set style line 1  lw 0.1;
+set xrange [0.01:]
+
+#set term qt font ',18'
+
+particleW = system("python calcWeight.py 0.75 1")
+
+set xlabel "Time (s)"
+set ylabel "Normalized Force (F/p_W)"
+plot 'forces_particle_1.txt' u 1:($4/particleW) every 1 with l t 'f_y', \
+     'forces_particle_1.txt' u 1:($2/particleW) every 1 with l t 'f_x'
+
+pause 1
+reread

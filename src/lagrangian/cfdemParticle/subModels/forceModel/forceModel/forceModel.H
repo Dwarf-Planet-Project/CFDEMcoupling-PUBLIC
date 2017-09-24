@@ -143,6 +143,7 @@ public:
         inline double ** expForces() const { return particleCloud_.expForces_;};
 
         inline double ** DEMForces() const { return particleCloud_.DEMForces_;};
+        inline double ** DEMTorques() const { return particleCloud_.DEMTorques_;}; // Aycock
 
         inline double ** Cds() const { return particleCloud_.Cds_;};
 

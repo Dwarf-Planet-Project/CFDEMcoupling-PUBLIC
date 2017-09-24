@@ -83,6 +83,7 @@ Foam::cfdemCloud::cfdemCloud
     impForces_(NULL),
     expForces_(NULL),
     DEMForces_(NULL),
+    DEMTorques_(NULL), // Aycock
     Cds_(NULL),
     radii_(NULL),
     voidfractions_(NULL),
@@ -279,6 +280,7 @@ Foam::cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(impForces_,3);
     dataExchangeM().destroy(expForces_,3);
     dataExchangeM().destroy(DEMForces_,3);
+    dataExchangeM().destroy(DEMTorques_,3); // Aycock
     dataExchangeM().destroy(Cds_,1);
     dataExchangeM().destroy(radii_,1);
     dataExchangeM().destroy(voidfractions_,1);
@@ -299,6 +301,8 @@ void Foam::cfdemCloud::giveDEMdata()
     if(forceM(0).coupleForce())
     {
         dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
+        dataExchangeM().giveData("hdtorque","vector-atom",DEMTorques_); // Aycock
+
 
         if(impDEMdrag_)
         {
@@ -333,6 +337,7 @@ void Foam::cfdemCloud::setForces()
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
+    resetArray(DEMTorques_,numberOfParticles(),3); // Aycock
     resetArray(Cds_,numberOfParticles(),1);
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
 }
@@ -460,7 +465,9 @@ bool Foam::cfdemCloud::evolve
     {
         if (dataExchangeM().couple())
         {
+            
             Info << "\n Coupling..." << endl;
+            //Pout << "Coupling... -> " << dataExchangeM().couple() << endl; 
             doCouple=true;
 
             // reset vol Fields
@@ -587,6 +594,7 @@ bool Foam::cfdemCloud::reAllocArrays() const
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
         dataExchangeM().allocateArray(DEMForces_,0.,3);
+        dataExchangeM().allocateArray(DEMTorques_,0.,3); // Aycock
         dataExchangeM().allocateArray(Cds_,0.,1);
         dataExchangeM().allocateArray(radii_,0.,1);
         dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());

@@ -113,35 +113,56 @@ label engineSearchIB::findCell
 
             // find cell
             label oldID = cellIDs[index][0];
+
+            // Test to see if the particle center is located in the current processor:
             cellIDs[index][0] = findSingleCell(position,oldID);
             //cellIDs[index][0] = particleCloud_.mesh().findCell(position);
 
             //mod by alice upon from here
-            if(cellIDs[index][0]<0){
-            	bool foundPos=0;
-            	int countPoints=0;
+            if(cellIDs[index][0]<0)
+            {
+                // Outline this procedure
+                // Either there is a bug, or this method has some limitations
+                // that cause some processors to "miss" the particle for a few timesteps
+                // when a particle crosses processor boundaries (Aycock)
+            	bool foundPos    = 0;
+            	int  countPoints = 0;
+                // Position vector (center of particle?)
             	vector pos=position;
-            	label altStartPos=-1;
-            	label numberOfPoints = zSplit_*xySplit_-2*(zSplit_-1);
-            	label thetaLevel=0;
-            	scalar theta, phi, thetaSize=180/zSplit_,phiSize=360/xySplit_, factor=M_PI/180.;
-            	while(countPoints<numberOfPoints && !foundPos){
-            		pos=position;
-            		if(countPoints==0)
-            			pos[2]+=radius;
-            		else if(countPoints==1)
-            			pos[2]-=radius;
-            		else 
-            		{
-            			thetaLevel=(countPoints-2)/xySplit_;
-            			theta=factor*thetaSize*thetaLevel;
-            			phi=factor*phiSize*(countPoints-2-thetaLevel*xySplit_);
-            			pos[0]+=radius*sin(theta)*cos(phi);
-            		    pos[1]+=radius*sin(theta)*sin(phi);
-            		    pos[2]+=radius*cos(theta);
-            		}
+            	label  altStartPos=-1;
+            	label  numberOfPoints = zSplit_*xySplit_-2*(zSplit_-1);
+            	label  thetaLevel=0;
+            	//scalar theta, phi, thetaSize=180/zSplit_,phiSize=360/xySplit_, factor=M_PI/180.;
+                // Fix by Aycock: We need the decimal points!!! Otherwise these values are evaluated
+                // as integers.
+            	scalar theta, phi, thetaSize=180./zSplit_,phiSize=360./xySplit_, factor=M_PI/180.;  // Aycock
+             
+                // "Satellite" points on the sphere surface are checked to see if the 
+                // particle can be found in the current processor.
+            	while(countPoints<numberOfPoints && !foundPos)
+                {
+                    pos=position;
+                    // What's going on here?
+                    if(countPoints==0)
+                        pos[2]+=radius;
+                    else if(countPoints==1)
+                        pos[2]-=radius; 
+                    // Create the satellite point:
+                    else 
+                    {
+                        thetaLevel=(countPoints-2)/xySplit_;
+                        //theta=factor*thetaSize*thetaLevel;
+                        theta=factor*thetaSize*(thetaLevel+1); // Aycock
+                        phi=factor*phiSize*(countPoints-2-thetaLevel*xySplit_);
+                        pos[0]+=radius*sin(theta)*cos(phi);
+                        pos[1]+=radius*sin(theta)*sin(phi);
+                        pos[2]+=radius*cos(theta);
+                    }
+                   
+                    // Check to see if the satellite point is contained in the current processor:
+                    altStartPos=findSingleCell(pos,oldID); 
+                    //particleCloud_.mesh().findCell(pos);//
 
-            		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     //check for periodic domains
                     if(checkPeriodicCells_)
                     {
@@ -156,11 +177,14 @@ label engineSearchIB::findCell
                                 pos[iDir]+=globalBb.max()[iDir]-globalBb.min()[iDir];
                             }
                         }
-                  		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+                  	altStartPos=findSingleCell(pos,oldID);
+                        //particleCloud_.mesh().findCell(pos);//
                     }
-                    
-            		if(altStartPos>=0) foundPos=1;
-            		countPoints++;
+                    // Was the satellite point found on the current processor?
+                    if(altStartPos>=0) foundPos=1;
+         
+                    // Advance the counter, and check the next satellite point
+            	    countPoints++;
             	}
                 if(foundPos) cellIDs[index][0]=altStartPos;
             }

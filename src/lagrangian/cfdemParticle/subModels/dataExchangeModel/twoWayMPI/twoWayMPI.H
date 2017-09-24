@@ -55,7 +55,7 @@ SourceFiles
 #include <stdlib.h>
 #include <string.h>
 #include "mpi.h"
-#include <lammps.h>         // these are LAMMPS include files
+#include <lammps.h>         // these are LAMMPS include files // Does the Make file point to $HOME/LIGGGHTS?
 #include <input.h>
 #include <atom.h>
 #include <library.h>
@@ -88,10 +88,13 @@ private:
     int nprocs;
 
     int liggghts;
-
+  
+    mutable bool firstTimeStep_; //AYCOCK
+    mutable bool secondTimeStep_; //AYCOCK
+ 
     MPI_Comm comm_liggghts;
 
-    LAMMPS_NS::LAMMPS *lmp;
+    //LAMMPS_NS::LAMMPS *lmp;
 
   // private member functions
 
@@ -99,6 +102,7 @@ private:
 
 public:
 
+    LAMMPS_NS::LAMMPS *lmp;
     //- Runtime type information
     TypeName("twoWayMPI");
 

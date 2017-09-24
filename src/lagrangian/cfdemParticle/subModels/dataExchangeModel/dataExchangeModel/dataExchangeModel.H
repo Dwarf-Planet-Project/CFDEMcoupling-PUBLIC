@@ -228,7 +228,8 @@ public:
             if (particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value()
              - ((1+couplingStep_)*(DEMts_*couplingInterval_))
              + 1e-10 > 0)                                         // Chr 27.03.2013 : first coupling after DEMts_*couplingInterval_
-//             > particleCloud_.mesh().time().deltaT().value()/2) // Chr 27.03.2013
+            //if(1) // Aycock
+//             > particleCloud_.mesh().time().deltaT().value()/2) // Chr 27.03.2013 // How does this behave differently from the above? Aycock
             {
                 return true;
             }

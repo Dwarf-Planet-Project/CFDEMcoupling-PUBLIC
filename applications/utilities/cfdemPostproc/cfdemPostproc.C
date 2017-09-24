@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     double **voidfractions_;
     double **particleWeights_;
     double **particleVolumes_;
+    double **particleV_;
     double **cellIDs_;
     
     particleCloud.dataExchangeM().allocateArray(positions_,0.,3);
@@ -80,6 +81,7 @@ int main(int argc, char *argv[])
     particleCloud.dataExchangeM().allocateArray(voidfractions_,0.,1);
     particleCloud.dataExchangeM().allocateArray(particleWeights_,0.,1);
     particleCloud.dataExchangeM().allocateArray(particleVolumes_,0.,1);
+    particleCloud.dataExchangeM().allocateArray(particleV_,0.,1);
     particleCloud.get_cellIDs(cellIDs_);  // get ref to cellIDs
     //particleCloud.dataExchangeM().allocateArray(cellIDs_,0.,1);
     
@@ -96,7 +98,7 @@ int main(int argc, char *argv[])
         particleCloud.averagingM().resetWeightFields();
         particleCloud.momCoupleM(0).resetMomSourceField();
 
-        particleCloud.dataExchangeM().couple();
+        particleCloud.dataExchangeM().couple(0);
 
         particleCloud.dataExchangeM().getData("x","vector-atom",positions_,count);
         particleCloud.dataExchangeM().getData("v","vector-atom",velocities_,count);
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
         particleCloud.locateM().findCell(NULL,positions_,cellIDs_,particleCloud.numberOfParticles());
         particleCloud.setPos(positions_);
 
-        particleCloud.voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
+        particleCloud.voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
 
         voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
         voidfraction.correctBoundaryConditions();
@@ -135,6 +137,7 @@ int main(int argc, char *argv[])
     particleCloud.dataExchangeM().destroy(voidfractions_,1);
     particleCloud.dataExchangeM().destroy(particleWeights_,1);
     particleCloud.dataExchangeM().destroy(particleVolumes_,1);
+    particleCloud.dataExchangeM().destroy(particleV_,1);
     //particleCloud.dataExchangeM().destroy(cellIDs_); // destroyed in cloud
 
     Info<< "End\n" << endl;

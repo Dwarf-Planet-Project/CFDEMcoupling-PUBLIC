@@ -107,6 +107,7 @@ protected:
     mutable double **expForces_;
 
     mutable double **DEMForces_;
+    mutable double **DEMTorques_; // Aycock
 
     mutable double **Cds_;
 
@@ -266,6 +267,7 @@ public:
        inline double ** expForces() const;
 
        inline double ** DEMForces() const;
+       inline double ** DEMTorques() const; // Aycock
 
        inline double ** Cds() const;
 

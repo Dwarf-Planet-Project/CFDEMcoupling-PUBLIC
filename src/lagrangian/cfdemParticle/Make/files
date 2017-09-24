@@ -26,7 +26,12 @@ $(forceModels)/SchillerNaumannDrag/SchillerNaumannDrag.C
 $(forceModels)/Archimedes/Archimedes.C
 $(forceModels)/ArchimedesIB/ArchimedesIB.C
 $(forceModels)/interface/interface.C
+$(forceModels)/gravityIB/gravityIB.C
 $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
+$(forceModels)/ShirgaonkarIBpressure/ShirgaonkarIBpressure.C
+$(forceModels)/ShirgaonkarIBviscous/ShirgaonkarIBviscous.C
+$(forceModels)/ShirgaonkarIBperiodicGradP/ShirgaonkarIBperiodicGradP.C
+$(forceModels)/ShirgaonkarIBTorques/ShirgaonkarIBTorques.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
