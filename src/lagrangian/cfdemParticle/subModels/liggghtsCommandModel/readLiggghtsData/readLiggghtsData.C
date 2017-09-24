@@ -120,7 +120,8 @@ const char* readLiggghtsData::command(int commandLine)
     insertionNr_++;
     strCommand_=string(command_ + add + " add");
 
-    return strCommand_.c_str();
+    return const_cast<char*>(strCommand_.c_str());
+    //return strCommand_.c_str();
 }
 
 bool readLiggghtsData::runCommand(int couplingStep)

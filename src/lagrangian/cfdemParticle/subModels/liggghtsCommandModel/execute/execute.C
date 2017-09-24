@@ -110,7 +110,8 @@ execute::~execute()
 
 const char* execute::command(int commandLine)
 {
-    return strCommand_.c_str();
+    return const_cast<char*>(strCommand_.c_str());
+    //return strCommand_.c_str();
 }
 
 bool execute::runCommand(int couplingStep)

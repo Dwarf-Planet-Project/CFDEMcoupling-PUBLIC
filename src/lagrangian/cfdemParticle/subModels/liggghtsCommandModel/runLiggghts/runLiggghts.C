@@ -95,7 +95,8 @@ runLiggghts::~runLiggghts()
 
 const char* runLiggghts::command(int commandLine)
 {
-    return strCommand_.c_str();
+    return const_cast<char*>(strCommand_.c_str());
+    //return strCommand_.c_str();
 }
 
 string runLiggghts::createCommand( word command, int interval, word appendix, word appendix2, word appendix3, word appendix4)
