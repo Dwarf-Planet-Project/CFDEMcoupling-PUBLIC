@@ -7,7 +7,7 @@ https://doi.org/10.1007/s10237-016-0857-3*
 
 Codes is based on CFDEMcoupling-PUBLIC 2.7.x, commit <a href="https://github.com/CFDEMproject/CFDEMcoupling-PUBLIC/commits/f231cd4928753c99498791539bab0de4b1caab7e">f231cd4928753c99498791539bab0de4b1caab7e</a>
 
-Tested with OpenFOAM 2.3.1
+Tested with <a href="https://openfoam.org/download/2-3-1-source/">OpenFOAM 2.3.1</a>
 
 Segré–Silberberg case included in 'tutorials' directory.
 
