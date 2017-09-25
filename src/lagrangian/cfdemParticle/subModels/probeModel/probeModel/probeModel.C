@@ -47,7 +47,7 @@ defineRunTimeSelectionTable(probeModel, dictionary);
 
 const char* probeModel::wordToChar(word& inWord) const
 {
-	return const_cast(inWord.c_str());
+	return const_cast<char*>(inWord.c_str());
 	//string HH = string(inWord);
 	//return const_cast(HH.c_str());
 }
