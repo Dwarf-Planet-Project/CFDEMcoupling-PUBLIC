@@ -9,6 +9,6 @@ Code is based on <a href="https://github.com/CFDEMproject/CFDEMcoupling-PUBLIC/t
 
 Tested with <a href="https://openfoam.org/download/2-3-1-source/">OpenFOAM 2.3.1</a> and <a href="https://github.com/CFDEMproject/LIGGGHTS-PUBLIC/tree/3ec8c7fc926f3f452892d4d869549dd5876cfe47">LIGGGHTS 3.0.2</a>
 
-Segré–Silberberg case included in 'tutorials' directory.
+Segré–Silberberg case included in the '<a href="https://github.com/kenaycock/CFDEMcoupling-PUBLIC/tree/CFDEM-2.7.x-Custom/tutorials">tutorials</a>' directory.
 
 kenaycock (at) gmail (dot) com
