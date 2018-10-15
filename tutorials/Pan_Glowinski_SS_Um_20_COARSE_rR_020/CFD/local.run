@@ -2,4 +2,4 @@
 
 rm -r processor* 
 decomposePar > log.decomposePar
-mpirun -np 8 cfdemSolverIB_mod_no_stop -parallel > log.cfdemSolverIB
+mpirun -np 2 cfdemSolverIB_mod_no_stop -parallel > log.cfdemSolverIB
