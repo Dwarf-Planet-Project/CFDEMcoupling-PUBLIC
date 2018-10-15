@@ -1,41 +1,25 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v1712                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  2.3.1                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      phiIB;
+    format      binary;
+    class       refinementHistory;
+    location    "2/polyMesh";
+    object      refinementHistory;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [ 0 2 -1 0 0 0 0 ];
+// splitCells
+0()
+// visibleCells
 
-internalField   uniform 0;
-
-boundaryField
-{
-    outlet
-    {
-        type            cyclicAMI;
-        value           uniform 0;
-    }
-    inlet
-    {
-        type            cyclicAMI;
-        value           uniform 0;
-    }
-    IVC
-    {
-        type            zeroGradient;
-    }
-}
+0
 
 
 // ************************************************************************* //

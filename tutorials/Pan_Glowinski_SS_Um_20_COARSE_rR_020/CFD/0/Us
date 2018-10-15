@@ -1,35 +1,35 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.1                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|  \\    /   O peration     | Version:  v1712                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
-    format      binary;
+    format      ascii;
     class       volVectorField;
     location    "0";
     object      Us;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
+dimensions      [ 0 1 -1 0 0 0 0 ];
 
-internalField   uniform (0 0 0);
+internalField   uniform ( 0 0 0 );
 
 boundaryField
 {
     outlet
     {
         type            cyclicAMI;
-        value           uniform (0 0 0);
+        value           uniform ( 0 0 0 );
     }
     inlet
     {
         type            cyclicAMI;
-        value           uniform (0 0 0);
+        value           uniform ( 0 0 0 );
     }
     IVC
     {

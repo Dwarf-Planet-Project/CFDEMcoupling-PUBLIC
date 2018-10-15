@@ -1,0 +1,2 @@
+*Note: this directory is a duplicate of that in ../../mesh_cyclic/snapped_mesh.
+Originally, a soft link was used, but this link broke on some systems when pulling the repository from github. 
